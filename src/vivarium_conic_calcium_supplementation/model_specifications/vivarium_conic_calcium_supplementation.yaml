@@ -9,11 +9,47 @@ components:
         population:
             - BasePopulation()
             - Mortality()
-        metrics:
-            - Disability()
-            - MortalityObserver()
+            - FertilityCrudeBirthRate()
+        disease.models:
+            - SIS('diarrheal_diseases')
+            - SIS('lower_respiratory_infections')
+            - SIR_fixed_duration('measles', '10')  # days
+            - NeonatalSWC_without_incidence('neonatal_sepsis_and_other_neonatal_infections')
+            - NeonatalSWC_without_incidence('neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma')
+            - NeonatalSWC_without_incidence('hemolytic_disease_and_other_neonatal_jaundice')
+        risks:
+            - Risk('alternative_risk_factor.child_wasting')
+            - RiskEffect('risk_factor.child_wasting', 'cause.diarrheal_diseases.incidence_rate')
+            - RiskEffect('risk_factor.child_wasting', 'cause.lower_respiratory_infections.incidence_rate')
+            - RiskEffect('risk_factor.child_wasting', 'cause.measles.incidence_rate')
 
-    vivarium_conic_calcium_supplementation.components:
+            - Risk('alternative_risk_factor.child_stunting')
+            - RiskEffect('risk_factor.child_stunting', 'cause.diarrheal_diseases.incidence_rate')
+            - RiskEffect('risk_factor.child_stunting', 'cause.lower_respiratory_infections.incidence_rate')
+            - RiskEffect('risk_factor.child_stunting', 'cause.measles.incidence_rate')
+
+            - Risk('alternative_risk_factor.child_underweight')
+            - RiskEffect('risk_factor.child_underweight', 'cause.diarrheal_diseases.incidence_rate')
+            - RiskEffect('risk_factor.child_underweight', 'cause.lower_respiratory_infections.incidence_rate')
+            - RiskEffect('risk_factor.child_underweight', 'cause.measles.incidence_rate')
+
+    vivarium_conic_calcium_supplementation:
+        components:
+            - LBWSGRisk()
+            - NeonatalPreterm()
+            - LBWSGRiskEffect('cause.neonatal_sepsis_and_other_neonatal_infections.excess_mortality')
+            - LBWSGRiskEffect('cause.neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma.excess_mortality')
+            - LBWSGRiskEffect('cause.hemolytic_disease_and_other_neonatal_jaundice.excess_mortality')
+            - LBWSGRiskEffect('cause.diarrheal_diseases.excess_mortality')
+            - LBWSGRiskEffect('cause.lower_respiratory_infections.excess_mortality')
+
+    vivarium_public_health.metrics:
+        - Disability()
+        - MortalityObserver()
+        - CategoricalRiskObserver('risk_factor.child_wasting')
+        - CategoricalRiskObserver('risk_factor.child_stunting')
+        - CategoricalRiskObserver('risk_factor.child_underweight')
+        - CategoricalRiskObserver('risk_factor.low_birth_weight_and_short_gestation')
 
 configuration:
     input_data:
@@ -29,19 +65,19 @@ configuration:
         random_seed: 0
     time:
         start:
-            year: 2005
+            year: 2020
             month: 7
             day: 2
         end:
-            year: 2010
+            year: 2025
             month: 7
             day: 2
         step_size: 1 # Days
     population:
         population_size: 100
         age_start: 0
-        age_end: 100
-
+        age_end: 5
+        exit_age: 5
     metrics:
         disability:
             by_age: False
