@@ -17,6 +17,10 @@ class LBWSGRisk:
         }
     }
 
+    @property
+    def name(self):
+        return "low_birthweight_short_gestation_risk"
+
     def __init__(self):
         self.risk = EntityString('risk_factor.low_birth_weight_and_short_gestation')
 
@@ -185,6 +189,10 @@ class LBWSGRiskEffect:
             }
         }
     }
+
+    @property
+    def name(self):
+        return f"low_birthweight_short_gestation_risk_effect.{self.target}"
 
     def __init__(self, target: str):
         """
