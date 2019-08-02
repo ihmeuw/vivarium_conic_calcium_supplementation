@@ -58,7 +58,7 @@ configuration:
         artifact_path: /share/costeffectiveness/artifacts/vivarium_conic_calcium_supplementation/vivarium_conic_calcium_supplementation.hdf
     interpolation:
         order: 0
-        extrapolate: False
+        extrapolate: True
     randomness:
         map_size: 1_000_000
         key_columns: ['entrance_time']
@@ -66,18 +66,24 @@ configuration:
     time:
         start:
             year: 2020
-            month: 7
-            day: 2
+            month: 1
+            day: 1
         end:
             year: 2025
-            month: 7
-            day: 2
+            month: 1
+            day: 1
         step_size: 1 # Days
     population:
         population_size: 100
         age_start: 0
         age_end: 5
         exit_age: 5
+    child_stunting:
+        category_thresholds: [7, 8, 9]
+    child_wasting:
+        category_thresholds: [7, 8, 9]
+    child_underweight:
+        category_thresholds: [7, 8, 9]
     metrics:
         disability:
             by_age: False
