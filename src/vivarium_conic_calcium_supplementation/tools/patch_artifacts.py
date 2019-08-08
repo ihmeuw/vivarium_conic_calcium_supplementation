@@ -7,17 +7,17 @@
 
 # Additionally, this only applies to some of the low birthweight and short
 # gestation data. However, when the component is added to a model
-# specification, the artifact builder will try to pull all the data it
+# specification the artifact builder will try to pull all the data it
 # needs -- some of which requires tables 3.4 and some greater than 3.4. Also,
 # neonatal preterm is directly dependent on the existence of low birthweight
 # and short gestation data so it cannot be in the model specification without
 # it.
 
-# So, the strategy to build artifacts for this project, is to build a base
+# So, the strategy to build artifacts for this project is to build a base
 # artifact with tables 3.4 for all data excluding low birthweight and short
 # gestation and neonatal preterm (comment them out). That data must then be
 # patched in using this script, once with an environment with tables 3.4 and
-# another with greater than. In the root of this repository, 
+# another with greater than. In the root of this repository
 # patch-requires.txt defines a patching environment.
 
 
