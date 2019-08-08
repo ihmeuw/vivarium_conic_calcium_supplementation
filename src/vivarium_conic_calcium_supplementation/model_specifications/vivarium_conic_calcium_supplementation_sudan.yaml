@@ -55,7 +55,7 @@ configuration:
     input_data:
         location: Sudan
         input_draw_number: 0
-        artifact_path: /share/costeffectiveness/artifacts/vivarium_conic_calcium_supplementation/vivarium_conic_calcium_supplementation.hdf
+        artifact_path: /share/costeffectiveness/artifacts/vivarium_conic_calcium_supplementation/vivarium_conic_calcium_supplementation_sudan.hdf
     interpolation:
         order: 0
         extrapolate: True
