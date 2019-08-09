@@ -37,6 +37,7 @@ components:
         components:
             - LBWSGRisk()
             - NeonatalPreterm()
+            - CalciumSupplementationIntervention()
             - LBWSGRiskEffect('cause.neonatal_sepsis_and_other_neonatal_infections.excess_mortality')
             - LBWSGRiskEffect('cause.neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma.excess_mortality')
             - LBWSGRiskEffect('cause.hemolytic_disease_and_other_neonatal_jaundice.excess_mortality')
@@ -78,12 +79,22 @@ configuration:
         age_start: 0
         age_end: 5
         exit_age: 5
+
     child_stunting:
         category_thresholds: [7, 8, 9]
     child_wasting:
         category_thresholds: [7, 8, 9]
     child_underweight:
         category_thresholds: [7, 8, 9]
+
+    calcium_supplementation_intervention:
+        proportion: 0.0
+        birth_weight_shift: 100  # grams
+        gestation_time_shift: 0  # weeks
+        stunting_shift: 0.3      # z-score
+        wasting_shift: 0.3       # z-score
+        underweight_shift: 0.0   # z-score
+
     metrics:
         disability:
             by_age: False
@@ -93,3 +104,4 @@ configuration:
             by_age: False
             by_sex: False
             by_year: False
+
