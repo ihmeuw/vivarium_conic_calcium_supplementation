@@ -54,9 +54,9 @@ components:
 
 configuration:
     input_data:
-        location: United States
+        location: Mali
         input_draw_number: 0
-        artifact_path: /share/costeffectiveness/artifacts/vivarium_conic_calcium_supplementation/vivarium_conic_calcium_supplementation.hdf
+        artifact_path: /share/costeffectiveness/artifacts/vivarium_conic_calcium_supplementation/vivarium_conic_calcium_supplementation_mali.hdf
     interpolation:
         order: 0
         extrapolate: True
@@ -75,7 +75,7 @@ configuration:
             day: 1
         step_size: 1 # Days
     population:
-        population_size: 100
+        population_size: 100_000
         age_start: 0
         age_end: 5
         exit_age: 5
