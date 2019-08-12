@@ -116,9 +116,12 @@ def validate_configuration(config):
     if not (0 <= config['proportion'] <= 1):
         raise ValueError(f'The proportion for calcium supplementation intervention must be between 0 and 1.'
                          f'You specified {config.proportion}.')
-    for key in config:
-        if 'shift' in key and isinstance(config[key], int) and config[key] < 0:
+
+    for key in ['stunting_shift', 'wasting_shift', 'underweight_shift']:
+        if config[key] < 0:
             raise ValueError(f'Additive shift for {key} must be positive.')
 
-    # TODO: Test the nested dictionaries
-
+    for key in ['birth_weight_shift', 'gestation_time_shift']:
+        for level, measure in [('population', 'mean'), ('population', 'sd'), ('individual', 'sd')]:
+            if config[key][level][measure] < 0:
+                raise ValueError(f"The {level} {measure} of {key} must be positive.")
