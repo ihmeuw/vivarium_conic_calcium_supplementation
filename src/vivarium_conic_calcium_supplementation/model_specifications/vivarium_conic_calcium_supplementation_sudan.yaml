@@ -89,8 +89,18 @@ configuration:
 
     calcium_supplementation_intervention:
         proportion: 0.0
-        birth_weight_shift: 100  # grams
-        gestation_time_shift: 0  # weeks
+        birth_weight_shift:  # grams
+            population:
+                mean: 100
+                sd: 30
+            individual:
+                sd: 30
+        gestation_time_shift:  # weeks
+            population:
+                mean: 0.5
+                sd: 0.25
+            individual:
+                sd: 0.25
         stunting_shift: 0.3      # z-score
         wasting_shift: 0.3       # z-score
         underweight_shift: 0.0   # z-score
