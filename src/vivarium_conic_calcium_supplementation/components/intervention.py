@@ -10,11 +10,11 @@ class CalciumSupplementationIntervention:
             'proportion': 0.5,
             'birth_weight_shift': {   # grams
                 'population': {
-                    'mean': 0.5,
-                    'sd': 0.25
+                    'mean': 100,
+                    'sd': 30
                 },
                 'individual': {
-                    'sd': 0.25
+                    'sd': 30
                 }
             },
             'gestation_time_shift': {  # weeks
