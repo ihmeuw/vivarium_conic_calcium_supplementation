@@ -101,8 +101,8 @@ configuration:
                 sd: 0.25
             individual:
                 sd: 0.25
-        stunting_shift: 0.0      # z-score
-        wasting_shift: 0.0       # z-score
+        stunting_shift: 0.3      # z-score
+        wasting_shift: 0.3       # z-score
         underweight_shift: 0.0   # z-score
 
     metrics:
