@@ -59,39 +59,46 @@ class CalciumSupplementationIntervention:
         builder.value.register_value_modifier('child_underweight.exposure',
                                               self.adjust_underweight)
 
-        self.pop_birth_weight_mean = self.get_effect_size(self.config.birth_weight_shift.population.mean,
-                                                          self.config.birth_weight_shift.population.sd,
-                                                          'population_birth_weight')
-        self.pop_gestation_time_mean = self.get_effect_size(self.config.gestation_time_shift.population.mean,
-                                                            self.config.gestation_time_shift.population.sd,
-                                                            'population_gestation_time')
+        self.pop_birth_weight_mean = self.get_population_effect_size(self.config.birth_weight_shift.population.mean,
+                                                                     self.config.birth_weight_shift.population.sd,
+                                                                     'population_birth_weight')
+        self.pop_gestation_time_mean = self.get_population_effect_size(self.config.gestation_time_shift.population.mean,
+                                                                       self.config.gestation_time_shift.population.sd,
+                                                                       'population_gestation_time')
         self.ind_birth_weight_effect = pd.Series()
         self.ind_gestation_time_effect = pd.Series()
 
     def on_initialize_simulants(self, pop_data):
         pop = pd.DataFrame({'calcium_supplementation_treatment_status': 'not_treated'}, index=pop_data.index)
+
+        ind_birth_effect = self.get_individual_effect_size(pop_data.index, self.pop_birth_weight_mean,
+                                                           self.config.birth_weight_shift.individual.sd,
+                                                           'individual_birth_weight')
+        self.ind_birth_weight_effect = self.ind_birth_weight_effect.append(ind_birth_effect)
+
+        ind_gestation_effect = self.get_individual_effect_size(pop_data.index, self.pop_gestation_time_mean,
+                                                               self.config.gestation_time_shift.individual.sd,
+                                                               'individual_gestation_time')
+        self.ind_gestation_time_effect = self.ind_gestation_time_effect.append(ind_gestation_effect)
+
         if pop_data.creation_time > self.start_time:
             treatment_probability = self.config.proportion
             treated = self.enrollment_randomness.filter_for_probability(pop.index, treatment_probability)
             pop.loc[treated, 'calcium_supplementation_treatment_status'] = 'treated'
 
-            ind_birth_effect = self.get_effect_size(self.pop_birth_weight_mean,
-                                                    self.config.birth_weight_shift.individual.sd,
-                                                    'individual_birth_weight')
-            self.ind_birth_weight_effect = self.ind_birth_weight_effect.append(ind_birth_effect, index=pop_data.index)
-
-            ind_gestation_effect = self.get_effect_size(self.pop_gestation_time_mean,
-                                                        self.config.gestation_time_shift.individual.sd,
-                                                        'individual_gestation_time')
-            self.ind_gestation_time_effect = self.ind_gestation_time_effect.append(ind_gestation_effect, index=pop_data.index)
-
         self.population_view.update(pop)
 
-    def get_effect_size(self, mean, sd, key):
+    def get_population_effect_size(self, mean, sd, key):
         r = np.random.RandomState(self.effect_randomness.get_seed(additional_key=key))
         draw = r.uniform()
         effect = scipy.stats.norm(mean, sd).ppf(draw)
         return effect
+
+    def get_individual_effect_size(self, index, mean, sd, key):
+        draw = self.effect_randomness.get_draw(index, additional_key=key)
+        effect_size = scipy.stats.norm(mean, sd).ppf(draw)
+        effect_size[effect_size < 0] = 0.0  # NOTE: Not allowing negative effect
+        return pd.Series(effect_size, index=index)
 
     def adjust_lbwsg(self, index, exposure):
         pop = self.population_view.get(index)
