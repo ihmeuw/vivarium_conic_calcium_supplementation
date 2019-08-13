@@ -102,8 +102,8 @@ class CalciumSupplementationIntervention:
 
     def adjust_lbwsg(self, index, exposure):
         pop = self.population_view.get(index)
-        exposure['birth_weight'] += self.config.birth_weight_shift * (pop.calcium_supplementation_treatment_status == 'treated')
-        exposure['gestation_time'] += self.config.gestation_time_shift * (pop.calcium_supplementation_treatment_status == 'treated')
+        exposure['birth_weight'] += self.ind_birth_weight_effect * (pop.calcium_supplementation_treatment_status == 'treated')
+        exposure['gestation_time'] += self.ind_gestation_time_effect * (pop.calcium_supplementation_treatment_status == 'treated')
         return exposure
 
     def adjust_stunting(self, index, exposure):
