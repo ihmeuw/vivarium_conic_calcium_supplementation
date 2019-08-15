@@ -30,35 +30,34 @@ class SampleHistoryObserver:
         # sets the sample index
         builder.population.initializes_simulants(self.get_sample_index)
 
-        columns_required = ['alive', 'age', 'sex', 'exit_time',
+        columns_required = ['alive', 'age', 'sex', 'entrance_time', 'exit_time',
+                            'cause_of_death',
                             'years_lived_with_disability',
                             'years_of_life_lost',
-                            'treatment_start', 'treatment_end',
-                            'healthcare_last_visit_date',
-                            'ischemic_heart_disease_event_time',
-                            'ischemic_stroke_event_time',
-                            'diabetes_mellitus_type_2_event_time',
-                            'gout_event_time',
-                            'asthma_event_time',
-                            'chronic_kidney_disease_due_to_hypertension_event_time',
-                            'chronic_kidney_disease_due_to_glomerulonephritis_event_time',
-                            'chronic_kidney_disease_due_to_other_and_unspecified_causes_event_time',
-                            'chronic_kidney_disease_due_to_diabetes_mellitus_type_2_event_time']
+                            'calcium_supplementation_treatment_status',
+                            'neonatal_preterm_birth_event_time',
+                            'diarrheal_diseases_event_time',
+                            'lower_respiratory_infections_event_time',
+                            'measles_event_time',
+                            'neonatal_sepsis_and_other_neonatal_infections_event_time',
+                            'neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma_event_time',
+                            'hemolytic_disease_and_other_neonatal_jaundice_event_time']
         self.population_view = builder.population.get_view(columns_required)
 
         # keys will become column names in the output
-        self.pipelines = {'bmi_exposure': builder.value.get_value('high_body_mass_index_in_adults.exposure'),
+        self.pipelines = {'mortality_rate': builder.value.get_value('mortality_rate'),
                           'disability_weight': builder.value.get_value('disability_weight'),
-                          'mortality_rate': builder.value.get_value('mortality_rate'),
-                          'ischemic_heart_disease_incidence': builder.value.get_value('ischemic_heart_disease.incidence_rate'),
-                          'ischemic_stroke_incidence': builder.value.get_value('ischemic_stroke.incidence_rate'),
-                          'diabetes_mellitus_type_2_incidence': builder.value.get_value('diabetes_mellitus_type_2.incidence_rate'),
-                          'gout_incidence': builder.value.get_value('gout.incidence_rate'),
-                          'asthma_incidence': builder.value.get_value('asthma.incidence_rate'),
-                          'chronic_kidney_disease_due_to_hypertension_incidence': builder.value.get_value('chronic_kidney_disease_due_to_hypertension.incidence_rate'),
-                          'chronic_kidney_disease_due_to_glomerulonephritis_incidence': builder.value.get_value('chronic_kidney_disease_due_to_glomerulonephritis.incidence_rate'),
-                          'chronic_kidney_disease_due_to_other_and_unspecified_causes_incidence': builder.value.get_value('chronic_kidney_disease_due_to_other_and_unspecified_causes.incidence_rate'),
-                          'chronic_kidney_disease_due_to_diabetes_mellitus_type_2_incidence': builder.value.get_value('chronic_kidney_disease_due_to_diabetes_mellitus_type_2.incidence_rate')}
+                          'child_wasting_exposure': builder.value.get_value('child_wasting.exposure'),
+                          'child_stunting_exposure': builder.value.get_value('child_stunting.exposure'),
+                          'child_underweight_exposure': builder.value.get_value('child_underweight.exposure'),
+                          'low_birth_weight_and_short_gestation_exposure':
+                              builder.value.get_value('low_birth_weight_and_short_gestation.exposure'),
+                          'diarrheal_diseases_incidence_rate':
+                              builder.value.get_value('diarrheal_diseases.incidence_rate'),
+                          'lower_respiratory_infections_incidence_rate':
+                              builder.value.get_value('lower_respiratory_infections.incidence_rate'),
+                          'measles_incidence_rate': builder.value.get_value('measles.incidence_rate'),
+                          }
 
         builder.event.register_listener('collect_metrics', self.record)
         builder.event.register_listener('simulation_end', self.dump)
@@ -83,11 +82,6 @@ class SampleHistoryObserver:
                 values = values.sum(axis=1)
             values = values.rename(name)
             pipeline_results.append(values)
-
-            if name == 'bmi_exposure':  # pipeline.source(index)
-                raw_values = pipeline.source(self.sample_index)
-                raw_values = raw_values.rename(f'{name}_baseline')
-                pipeline_results.append(raw_values)
 
         record = pd.concat(pipeline_results + [pop], axis=1)
         record['time'] = self.clock()
