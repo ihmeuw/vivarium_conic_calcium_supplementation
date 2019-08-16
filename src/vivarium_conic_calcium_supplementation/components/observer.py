@@ -24,7 +24,7 @@ class SampleHistoryObserver:
 
     def setup(self, builder):
         self.clock = builder.time.clock()
-        self.sample_history_parameters = builder.configuration.metrics.bmi_sample_history_observer
+        self.sample_history_parameters = builder.configuration.metrics.sample_history_observer
         self.randomness = builder.randomness.get_stream("sample_history")
 
         # sets the sample index
