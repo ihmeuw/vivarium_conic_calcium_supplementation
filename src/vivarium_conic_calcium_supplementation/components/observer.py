@@ -75,7 +75,7 @@ class SampleHistoryObserver:
 
         pipeline_results = []
         for name, pipeline in self.pipelines.items():
-            values = pipeline(self.sample_index)
+            values = pipeline(pop.index)
             if name == 'mortality_rate':
                 values = values.sum(axis=1)
             values = values.rename(name)
