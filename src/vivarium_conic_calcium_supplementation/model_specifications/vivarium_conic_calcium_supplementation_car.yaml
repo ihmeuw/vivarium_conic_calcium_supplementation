@@ -43,6 +43,7 @@ components:
             - LBWSGRiskEffect('cause.hemolytic_disease_and_other_neonatal_jaundice.excess_mortality')
             - LBWSGRiskEffect('cause.diarrheal_diseases.excess_mortality')
             - LBWSGRiskEffect('cause.lower_respiratory_infections.excess_mortality')
+            - SampleHistoryObserver()
 
     vivarium_public_health.metrics:
         - Disability()
@@ -107,11 +108,14 @@ configuration:
 
     metrics:
         disability:
-            by_age: False
-            by_sex: False
+            by_age: True
+            by_sex: True
             by_year: False
         mortality:
-            by_age: False
-            by_sex: False
+            by_age: True
+            by_sex: True
             by_year: False
+        sample_history_observer:
+            sample_size: 500
+            path: /share/costeffectiveness/results/vivarium_conic_calcium_supplementation/car_sample_history.hdf
 
