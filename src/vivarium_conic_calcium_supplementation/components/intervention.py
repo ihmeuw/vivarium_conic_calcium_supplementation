@@ -7,7 +7,7 @@ class CalciumSupplementationIntervention:
 
     configuration_defaults = {
         'calcium_supplementation_intervention': {
-            'proportion': 0.5,
+            'proportion': 1.0,
             'birth_weight_shift': {   # grams
                 'population': {
                     'mean': 100,
@@ -42,10 +42,13 @@ class CalciumSupplementationIntervention:
         validate_configuration(self.config.to_dict())
 
         self.enrollment_randomness = builder.randomness.get_stream('calcium_supplementation_intervention_enrollment')
+        self.anc1_randomness = builder.randomness.get_stream('anc1_visit')
         self.effect_randomness = builder.randomness.get_stream('effect_draw')
 
-        columns_created = ['calcium_supplementation_treatment_status']
+        columns_created = ['had_anc1_visit', 'calcium_supplementation_treatment_status']
         self.population_view = builder.population.get_view(columns_created)
+
+        self.anc1_rates = builder.lookup.build_table(builder.data.load("covariate.antenatal_care_1_visit_coverage_proportion.estimate"))
 
         builder.population.initializes_simulants(self.on_initialize_simulants,
                                                  creates_columns=columns_created)
@@ -69,7 +72,8 @@ class CalciumSupplementationIntervention:
         self.ind_gestation_time_effect = pd.Series()
 
     def on_initialize_simulants(self, pop_data):
-        pop = pd.DataFrame({'calcium_supplementation_treatment_status': 'not_treated'}, index=pop_data.index)
+        pop = pd.DataFrame({'calcium_supplementation_treatment_status': 'not_treated',
+                            'had_anc1_visit': False}, index=pop_data.index)
 
         ind_birth_effect = self.get_individual_effect_size(pop_data.index, self.pop_birth_weight_mean,
                                                            self.config.birth_weight_shift.individual.sd,
@@ -81,9 +85,12 @@ class CalciumSupplementationIntervention:
                                                                'individual_gestation_time')
         self.ind_gestation_time_effect = self.ind_gestation_time_effect.append(ind_gestation_effect)
 
+        effective_anc1 = self.anc1_rates(pop.index)
+        had_anc1 = self.anc1_randomness.filter_for_probability(pop.index, effective_anc1)
+        pop.loc[had_anc1, 'had_anc1_visit'] = True
         if pop_data.creation_time > self.start_time:
             treatment_probability = self.config.proportion
-            treated = self.enrollment_randomness.filter_for_probability(pop.index, treatment_probability)
+            treated = self.enrollment_randomness.filter_for_probability(had_anc1, treatment_probability)
             pop.loc[treated, 'calcium_supplementation_treatment_status'] = 'treated'
 
         self.population_view.update(pop)
