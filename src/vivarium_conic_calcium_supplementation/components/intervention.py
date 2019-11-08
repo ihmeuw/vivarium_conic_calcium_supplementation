@@ -42,13 +42,18 @@ class CalciumSupplementationIntervention:
         validate_configuration(self.config.to_dict())
 
         self.enrollment_randomness = builder.randomness.get_stream('calcium_supplementation_intervention_enrollment')
-        self.anc1_randomness = builder.randomness.get_stream('anc1_visit')
+        self.anc1_coverage_randomness = builder.randomness.get_stream('anc1_coverage')
+        self.anc1_visit_randomness = builder.randomness.get_stream('anc1_visit')
         self.effect_randomness = builder.randomness.get_stream('effect_draw')
 
-        columns_created = ['had_anc1_visit', 'calcium_supplementation_treatment_status']
+        columns_created = ['anc1_visit_status', 'calcium_supplementation_treatment_status']
         self.population_view = builder.population.get_view(columns_created)
 
-        self.anc1_rates = builder.lookup.build_table(builder.data.load("covariate.antenatal_care_1_visit_coverage_proportion.estimate"))
+        raw_anc1 = builder.data.load("covariate.antenatal_care_1_visit_coverage_proportion.estimate")
+        effective_anc1_coverage = self.get_anc1_coverage(raw_anc1, self.anc1_coverage_randomness.get_seed())
+        self.effective_anc1_coverage = builder.lookup.build_table(effective_anc1_coverage,
+                                                                  key_columns=[],
+                                                                  parameter_columns=[('year', 'year_start', 'year_end')])
 
         builder.population.initializes_simulants(self.on_initialize_simulants,
                                                  creates_columns=columns_created)
@@ -73,7 +78,7 @@ class CalciumSupplementationIntervention:
 
     def on_initialize_simulants(self, pop_data):
         pop = pd.DataFrame({'calcium_supplementation_treatment_status': 'not_treated',
-                            'had_anc1_visit': False}, index=pop_data.index)
+                            'anc1_visit_status': False}, index=pop_data.index)
 
         ind_birth_effect = self.get_individual_effect_size(pop_data.index, self.pop_birth_weight_mean,
                                                            self.config.birth_weight_shift.individual.sd,
@@ -85,15 +90,34 @@ class CalciumSupplementationIntervention:
                                                                'individual_gestation_time')
         self.ind_gestation_time_effect = self.ind_gestation_time_effect.append(ind_gestation_effect)
 
-        effective_anc1 = self.anc1_rates(pop.index)
-        had_anc1 = self.anc1_randomness.filter_for_probability(pop.index, effective_anc1)
-        pop.loc[had_anc1, 'had_anc1_visit'] = True
+        effective_anc1 = self.effective_anc1_coverage(pop.index)
+        had_anc1 = self.anc1_visit_randomness.filter_for_probability(pop.index, effective_anc1)
+        pop.loc[had_anc1, 'anc1_visit_status'] = True
         if pop_data.creation_time > self.start_time:
             treatment_probability = self.config.proportion
             treated = self.enrollment_randomness.filter_for_probability(had_anc1, treatment_probability)
             pop.loc[treated, 'calcium_supplementation_treatment_status'] = 'treated'
 
         self.population_view.update(pop)
+
+    @staticmethod
+    def get_anc1_coverage(raw_anc1, seed):
+        mean = raw_anc1.loc[raw_anc1.parameter == 'mean_value'].sort_values(by='year_start').reset_index(drop=True)
+        lower = raw_anc1.loc[raw_anc1.parameter == 'lower_value'].sort_values(by='year_start').reset_index(drop=True)
+        upper = raw_anc1.loc[raw_anc1.parameter == 'upper_value'].sort_values(by='year_start').reset_index(drop=True)
+
+        loc = lower.value
+        scale = upper.value - lower.value
+        c = (mean.value - loc) / scale
+
+        tri_distribution = scipy.stats.triang(c, loc=loc, scale=scale)
+
+        coverages = tri_distribution.rvs(random_state=seed)
+
+        anc1_coverage = pd.DataFrame({'value': coverages,
+                                      'year_start': mean['year_start'],
+                                      'year_end': mean['year_end']})
+        return anc1_coverage
 
     def get_population_effect_size(self, mean, sd, key):
         r = np.random.RandomState(self.effect_randomness.get_seed(additional_key=key))
