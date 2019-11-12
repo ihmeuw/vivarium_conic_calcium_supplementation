@@ -94,8 +94,7 @@ class CalciumSupplementationIntervention:
         had_anc1 = self.anc1_visit_randomness.filter_for_probability(pop.index, effective_anc1)
         pop.loc[had_anc1, 'anc1_visit_status'] = True
         if pop_data.creation_time > self.start_time:
-            treatment_probability = self.config.proportion
-            treated = self.enrollment_randomness.filter_for_probability(had_anc1, treatment_probability)
+            treated = self.enrollment_randomness.filter_for_probability(had_anc1, self.config.proportion)
             pop.loc[treated, 'calcium_supplementation_treatment_status'] = 'treated'
 
         self.population_view.update(pop)
