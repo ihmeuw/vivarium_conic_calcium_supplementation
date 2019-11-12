@@ -90,6 +90,8 @@ class CalciumSupplementationIntervention:
                                                                'individual_gestation_time')
         self.ind_gestation_time_effect = self.ind_gestation_time_effect.append(ind_gestation_effect)
 
+        # Effective_anc1_coverage is a lookup table of anc1 probabilities along demog dimensions.
+        # It was sampled from a triangular distribution built from the covariate mean and uncertainty.
         effective_anc1 = self.effective_anc1_coverage(pop.index)
         had_anc1 = self.anc1_visit_randomness.filter_for_probability(pop.index, effective_anc1)
         pop.loc[had_anc1, 'anc1_visit_status'] = True
