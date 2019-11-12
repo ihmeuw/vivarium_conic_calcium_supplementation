@@ -89,7 +89,7 @@ configuration:
         category_thresholds: [7, 8, 9]
 
     calcium_supplementation_intervention:
-        proportion: 0.5
+        proportion: 1.0
         birth_weight_shift:  # grams
             population:
                 mean: 100
@@ -102,8 +102,8 @@ configuration:
                 sd: 0.25
             individual:
                 sd: 0.25
-        stunting_shift: 0.3      # z-score
-        wasting_shift: 0.3       # z-score
+        stunting_shift: 0.0      # z-score
+        wasting_shift: 0.0       # z-score
         underweight_shift: 0.0   # z-score
 
     metrics:
