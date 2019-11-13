@@ -92,16 +92,16 @@ configuration:
         proportion: 1.0
         birth_weight_shift:  # grams
             population:
-                mean: 100
-                sd: 30
+                mean: 101.1873
+                sd: 94.451841
             individual:
-                sd: 30
+                sd: 0.0
         gestation_time_shift:  # weeks
             population:
-                mean: 0.5
-                sd: 0.25
+                mean: 0.4349
+                sd: 0.62419499
             individual:
-                sd: 0.25
+                sd: 0.0
         stunting_shift: 0.0      # z-score
         wasting_shift: 0.0       # z-score
         underweight_shift: 0.0   # z-score
