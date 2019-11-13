@@ -45,9 +45,6 @@ class SampleHistoryObserver:
         # keys will become column names in the output
         self.pipelines = {'mortality_rate': builder.value.get_value('mortality_rate'),
                           'disability_weight': builder.value.get_value('disability_weight'),
-                          'child_wasting_exposure': builder.value.get_value('child_wasting.exposure'),
-                          'child_stunting_exposure': builder.value.get_value('child_stunting.exposure'),
-                          'child_underweight_exposure': builder.value.get_value('child_underweight.exposure'),
                           'low_birth_weight_and_short_gestation_exposure':
                               builder.value.get_value('low_birth_weight_and_short_gestation.exposure'),
                           'diarrheal_diseases_incidence_rate':

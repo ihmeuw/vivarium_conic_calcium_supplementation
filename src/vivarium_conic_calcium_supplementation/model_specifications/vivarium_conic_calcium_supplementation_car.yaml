@@ -17,21 +17,6 @@ components:
             - NeonatalSWC_without_incidence('neonatal_sepsis_and_other_neonatal_infections')
             - NeonatalSWC_without_incidence('neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma')
             - NeonatalSWC_without_incidence('hemolytic_disease_and_other_neonatal_jaundice')
-        risks:
-            - Risk('alternative_risk_factor.child_wasting')
-            - RiskEffect('risk_factor.child_wasting', 'cause.diarrheal_diseases.incidence_rate')
-            - RiskEffect('risk_factor.child_wasting', 'cause.lower_respiratory_infections.incidence_rate')
-            - RiskEffect('risk_factor.child_wasting', 'cause.measles.incidence_rate')
-
-            - Risk('alternative_risk_factor.child_stunting')
-            - RiskEffect('risk_factor.child_stunting', 'cause.diarrheal_diseases.incidence_rate')
-            - RiskEffect('risk_factor.child_stunting', 'cause.lower_respiratory_infections.incidence_rate')
-            - RiskEffect('risk_factor.child_stunting', 'cause.measles.incidence_rate')
-
-            - Risk('alternative_risk_factor.child_underweight')
-            - RiskEffect('risk_factor.child_underweight', 'cause.diarrheal_diseases.incidence_rate')
-            - RiskEffect('risk_factor.child_underweight', 'cause.lower_respiratory_infections.incidence_rate')
-            - RiskEffect('risk_factor.child_underweight', 'cause.measles.incidence_rate')
 
     vivarium_conic_calcium_supplementation:
         components:
@@ -43,14 +28,10 @@ components:
             - LBWSGRiskEffect('cause.hemolytic_disease_and_other_neonatal_jaundice.excess_mortality')
             - LBWSGRiskEffect('cause.diarrheal_diseases.excess_mortality')
             - LBWSGRiskEffect('cause.lower_respiratory_infections.excess_mortality')
-            - SampleHistoryObserver()
 
     vivarium_public_health.metrics:
         - Disability()
         - MortalityObserver()
-        - CategoricalRiskObserver('risk_factor.child_wasting')
-        - CategoricalRiskObserver('risk_factor.child_stunting')
-        - CategoricalRiskObserver('risk_factor.child_underweight')
         - CategoricalRiskObserver('risk_factor.low_birth_weight_and_short_gestation')
 
 configuration:
@@ -76,17 +57,10 @@ configuration:
             day: 1
         step_size: 1 # Days
     population:
-        population_size: 100_000
+        population_size: 10_000
         age_start: 0
         age_end: 5
         exit_age: 5
-
-    child_stunting:
-        category_thresholds: [7, 8, 9]
-    child_wasting:
-        category_thresholds: [7, 8, 9]
-    child_underweight:
-        category_thresholds: [7, 8, 9]
 
     calcium_supplementation_intervention:
         proportion: 1.0
