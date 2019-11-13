@@ -1,5 +1,7 @@
-input_draw_count: 10
-random_seed_count: 5
+input_draw_count: 200
+random_seed_count: 10
 
 branches:
-    
+    - calcium_supplementation_intervention:
+        proportion: [0.0, 1.0]
+
