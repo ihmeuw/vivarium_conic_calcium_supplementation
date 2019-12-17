@@ -124,12 +124,16 @@ class CalciumSupplementationIntervention:
         r = np.random.RandomState(self.effect_randomness.get_seed(additional_key=key))
         draw = r.uniform()
         effect = scipy.stats.norm(mean, sd).ppf(draw)
+        effect = effect if effect > 0.0 else 0.0 # NOTE: Not allowing negative effect
         return effect
 
     def get_individual_effect_size(self, index, mean, sd, key):
         draw = self.effect_randomness.get_draw(index, additional_key=key)
-        effect_size = scipy.stats.norm(mean, sd).ppf(draw)
-        effect_size[effect_size < 0] = 0.0  # NOTE: Not allowing negative effect
+        if sd > 0:
+            effect_size = scipy.stats.norm(mean, sd).ppf(draw)
+            effect_size[effect_size < 0] = 0.0  # NOTE: Not allowing negative effect
+        else:
+            effect_size = mean    
         return pd.Series(effect_size, index=index)
 
     def adjust_lbwsg(self, index, exposure):
