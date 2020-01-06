@@ -61,5 +61,6 @@ if __name__ == "__main__":
         entry_points='''
             [console_scripts]
             make_specs=vivarium_conic_calcium_supplementation.tools.cli:make_specs
+            build_calcium_artifact=vivarium_conic_calcium_supplementation.tools.cli:build_calcium_artifact
         '''
     )
