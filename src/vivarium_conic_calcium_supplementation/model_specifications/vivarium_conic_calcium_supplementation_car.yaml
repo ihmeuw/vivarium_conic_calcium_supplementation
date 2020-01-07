@@ -9,7 +9,7 @@ components:
         population:
             - BasePopulation()
             - Mortality()
-            - FertilityCrudeBirthRate()
+#            - FertilityCrudeBirthRate()
         disease.models:
             - SIS('diarrheal_diseases')
             - SIS('lower_respiratory_infections')
@@ -59,7 +59,7 @@ configuration:
     population:
         population_size: 10_000
         age_start: 0
-        age_end: 5
+        age_end: 0
         exit_age: 5
 
     calcium_supplementation_intervention:
