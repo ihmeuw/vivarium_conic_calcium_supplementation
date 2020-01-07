@@ -119,6 +119,7 @@ def build_artifact(location: str, output_dir: str, erase: bool):
         artifact_path.unlink()
     artifact = create_new_artifact(artifact_path, location)
     write_demographic_data(artifact, location)
+    write_covariate_data(artifact, location)
     write_disease_data(artifact, location)
     write_alternative_risk_data(artifact, location)
     write_lbwsg_data(artifact, location)
