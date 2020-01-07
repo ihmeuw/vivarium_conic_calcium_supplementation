@@ -43,7 +43,7 @@ def write_demographic_data(artifact: Artifact, location: str):
 def write_covariate_data(artifact: Artifact, location: str):
     logger.info('Writing covariate data...')
 
-    covariates = ['live_births_by_sex', 'antenatal_care_1_visit_coverage_proporiton']
+    covariates = ['live_births_by_sex', 'antenatal_care_1_visit_coverage_proportion']
     measures = ['estimate']
 
     keys = [EntityKey(f'covariate.{c}.{m}') for c, m in itertools.product(covariates, measures)]
