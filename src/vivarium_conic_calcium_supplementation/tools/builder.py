@@ -13,21 +13,21 @@ def create_new_artifact(path: str, location: str) -> Artifact:
     artifact = Artifact(path, filter_terms=[get_location_term(location)])
     key = EntityKey('metadata.locations')
     if str(key) not in artifact:
-        logger.info(f'\tWriting {key}.')
+        logger.info(f'writing {key}.')
         artifact.write('metadata.locations', [location])
     else:
-        logger.info(f'\t{key} found in artifact.')
+        logger.info(f'{key} found in artifact.')
     return artifact
 
 
 def safe_write(artifact: Artifact, keys: Sequence, location: str):
     for key in keys:
         if str(key) not in artifact:
-            logger.info(f'\tWriting {key}.')
+            logger.info(f'writing {key}.')
             data = loader(key, location, set())
             artifact.write(key, data)
         else:
-            logger.info(f'\t{key} found in artifact.')
+            logger.info(f'{key} found in artifact.')
 
 
 def write_demographic_data(artifact: Artifact, location: str):
@@ -57,15 +57,15 @@ def write_disease_data(artifact: Artifact, location: str):
         'all_causes': ['cause_specific_mortality_rate'],
         'diarrheal_diseases':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
-             'incidence_rate', 'prevalence', 'remission'],
+             'incidence_rate', 'prevalence', 'remission_rate'],
         'lower_respiratory_infections':
-            ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight'
-             'incidence_rate', 'prevalence', 'remission'],
+            ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
+             'incidence_rate', 'prevalence', 'remission_rate'],
         'measles':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
              'incidence_rate', 'prevalence'],
         'neonatal_sepsis_and_other_neonatal_infections':
-            ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight'
+            ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
              'birth_prevalence', 'prevalence'],
         'neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
@@ -99,15 +99,15 @@ def write_lbwsg_data(artifact, location):
 
     # locations whose data was saved with an incompatible tables version
     if location in ['Mali']:
-        data_source = Path('/share/costeffectiveness/lbwsg/artifacts') / location.replace(" ", "_")
+        data_source = Path('/share/costeffectiveness/lbwsg/artifacts') / f"{location.replace(' ', '_')}.hdf"
         reversioned_artifact = Artifact(data_source)
         for key in keys:
             if str(key) not in artifact:
-                logger.info(f'\tWriting {key}.')
-                data = reversioned_artifact.load(key)
+                logger.info(f'writing {key}.')
+                data = reversioned_artifact.load(str(key))
                 artifact.write(key, data)
             else:
-                logger.info(f'\t{key} found in artifact.')
+                logger.info(f'{key} found in artifact.')
     else:
         safe_write(artifact, keys, location)
 
