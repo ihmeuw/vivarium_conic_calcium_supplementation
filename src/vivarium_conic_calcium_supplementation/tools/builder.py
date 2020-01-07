@@ -114,7 +114,7 @@ def write_lbwsg_data(artifact, location):
 
 def build_artifact(location: str, output_dir: str, erase: bool):
 
-    artifact_path = Path(output_dir) / f'{location.replace(" ", "_")}.hdf'
+    artifact_path = Path(output_dir) / f'{location.replace(" ", "_").lower()}.hdf'
     if erase and artifact_path.is_file():
         artifact_path.unlink()
     artifact = create_new_artifact(artifact_path, location)
