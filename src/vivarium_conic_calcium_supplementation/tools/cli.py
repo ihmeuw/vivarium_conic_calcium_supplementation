@@ -26,6 +26,7 @@ from loguru import logger
 
 from vivarium.framework.utilities import handle_exceptions
 
+from vivarium_conic_calcium_supplementation import paths
 from vivarium_conic_calcium_supplementation.tools import builder
 
 
@@ -171,10 +172,9 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
 @click.command()
 @click.option('-l', '--location',
               required=True,
-              # type=click.Choice(ltbi_globals.LOCATIONS),
               help='The location for which to build an artifact')
 @click.option('-o', '--output-dir',
-              # default=str(ltbi_paths.ARTIFACT_ROOT),
+              default=str(paths.ARTIFACT_ROOT),
               show_default=True,
               type=click.Path(exists=True, dir_okay=True),
               help='Specify an output directory. Directory must exist.')
