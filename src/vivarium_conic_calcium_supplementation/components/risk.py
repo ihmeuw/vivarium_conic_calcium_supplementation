@@ -215,9 +215,13 @@ class LBWSGRiskEffect:
 
     def setup(self, builder):
         self.randomness = builder.randomness.get_stream(f'effect_of_{self.risk.name}_on_{self.target.name}')
-        self.relative_risk = builder.lookup.build_table(self.get_relative_risk_data(builder))
+        self.relative_risk = builder.lookup.build_table(self.get_relative_risk_data(builder),
+                                                        key_columns=['sex'],
+                                                        parameter_columns=['age', 'year'])
         self.population_attributable_fraction = builder.lookup.build_table(
-            data_transformations.get_population_attributable_fraction_data(builder, self.risk, self.target, self.randomness)
+            data_transformations.get_population_attributable_fraction_data(builder, self.risk, self.target, self.randomness),
+            key_columns=['sex'],
+            parameter_columns=['age', 'year']
         )
 
         self.exposure_effect = data_transformations.get_exposure_effect(builder, self.risk)
