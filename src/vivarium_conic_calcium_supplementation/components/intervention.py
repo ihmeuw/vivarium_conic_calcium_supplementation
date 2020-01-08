@@ -53,7 +53,7 @@ class CalciumSupplementationIntervention:
         effective_anc1_coverage = self.get_anc1_coverage(raw_anc1, self.anc1_coverage_randomness.get_seed())
         self.effective_anc1_coverage = builder.lookup.build_table(effective_anc1_coverage,
                                                                   key_columns=[],
-                                                                  parameter_columns=[('year', 'year_start', 'year_end')])
+                                                                  parameter_columns=['year'])
 
         builder.population.initializes_simulants(self.on_initialize_simulants,
                                                  creates_columns=columns_created)

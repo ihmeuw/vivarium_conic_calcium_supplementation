@@ -65,7 +65,9 @@ class LBWSGDistribution:
         self.intervals_by_category = self.categories_by_interval.reset_index().set_index('cat')
         self.max_gt_by_bw, self.max_bw_by_gt = self._get_boundary_mappings()
 
-        self.exposure_parameters = builder.lookup.build_table(get_exposure_data(builder, self.risk))
+        self.exposure_parameters = builder.lookup.build_table(get_exposure_data(builder, self.risk),
+                                                              key_columns=['sex'],
+                                                              parameter_columns=['age', 'year'])
 
     def get_birth_weight_and_gestational_age(self, index):
         category_draw = self.randomness.get_draw(index, additional_key='category')
