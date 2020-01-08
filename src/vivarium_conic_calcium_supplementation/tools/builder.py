@@ -70,6 +70,9 @@ def write_disease_data(artifact: Artifact, location: str):
         'neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
              'birth_prevalence', 'prevalence', 'restrictions'],
+        'hemolytic_disease_and_other_neonatal_jaundice':
+            ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
+             'birth_prevalence', 'prevalence', 'restrictions'],
         'neonatal_preterm_birth':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
              'restrictions'],
