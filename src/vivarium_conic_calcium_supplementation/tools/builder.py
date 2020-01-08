@@ -1,4 +1,5 @@
 import itertools
+from functools import partial
 from pathlib import Path
 from typing import Sequence, Mapping
 
@@ -34,7 +35,7 @@ def write_demographic_data(artifact: Artifact, location: str):
             EntityKey('population.age_bins'),
             EntityKey('population.theoretical_minimum_risk_life_expectancy'),
             EntityKey('population.demographic_dimensions')]
-    getters = {k: lambda: loader(k, location, set()) for k in keys}
+    getters = {k: partial(loader, k, location, set()) for k in keys}
     safe_write(artifact, keys, getters)
 
 
@@ -45,7 +46,7 @@ def write_covariate_data(artifact: Artifact, location: str):
     measures = ['estimate']
 
     keys = [EntityKey(f'covariate.{c}.{m}') for c, m in itertools.product(covariates, measures)]
-    getters = {k: lambda: loader(k, location, set()) for k in keys}
+    getters = {k: partial(loader, k, location, set()) for k in keys}
     safe_write(artifact, keys, getters)
 
 
@@ -78,7 +79,7 @@ def write_disease_data(artifact: Artifact, location: str):
     }
     for cause, measures in cause_measures.items():
         keys = [EntityKey(f'cause.{cause}.{m}') for m in measures]
-        getters = {k: lambda: loader(k, location, set()) for k in keys}
+        getters = {k: partial(loader, k, location, set()) for k in keys}
         safe_write(artifact, keys, getters)
 
 
@@ -90,7 +91,7 @@ def write_alternative_risk_data(artifact, location):
     alternative_measures = ['exposure', 'exposure_distribution_weights', 'exposure_standard_deviation']
     keys = [EntityKey(f'alternative_risk_factor.{r}.{m}') for r, m in itertools.product(risks, alternative_measures)]
     keys.extend([EntityKey(f'risk_factor.{r}.{m}') for r, m in itertools.product(risks, measures)])
-    getters = {k: lambda: loader(k, location, set()) for k in keys}
+    getters = {k: partial(loader, k, location, set()) for k in keys}
     safe_write(artifact, keys, getters)
 
 
@@ -105,9 +106,9 @@ def write_lbwsg_data(artifact, location):
     if location in ['Mali']:
         data_source = Path('/share/costeffectiveness/lbwsg/artifacts') / f"{location.replace(' ', '_')}.hdf"
         reversioned_artifact = Artifact(data_source)
-        getters = {k: lambda: reversioned_artifact.load(str(k)) for k in keys}
+        getters = {k: partial(reversioned_artifact.load, str(k)) for k in keys}
     else:
-        getters = {k: lambda: loader(k, location, set()) for k in keys}
+        getters = {k: partial(loader, k, location, set()) for k in keys}
     safe_write(artifact, keys, getters)
 
 
