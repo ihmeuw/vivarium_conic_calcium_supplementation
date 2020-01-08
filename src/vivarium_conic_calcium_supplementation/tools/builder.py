@@ -109,6 +109,14 @@ def write_lbwsg_data(artifact, location):
         getters = {k: partial(reversioned_artifact.load, str(k)) for k in keys}
     else:
         getters = {k: partial(loader, k, location, set()) for k in keys}
+
+    # these measures are not tables dependent
+    metadata_measures = ['categories', 'distribution']
+    metadata_keys = [EntityKey(f'risk_factor.{risk}.{m}') for m in metadata_measures]
+    metadata_getters = {k: partial(loader, k, location, set()) for k in metadata_keys}
+    keys.extend(metadata_keys)
+    getters.update(metadata_getters)
+
     safe_write(artifact, keys, getters)
 
 
