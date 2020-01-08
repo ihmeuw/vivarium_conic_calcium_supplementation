@@ -57,21 +57,22 @@ def write_disease_data(artifact: Artifact, location: str):
         'all_causes': ['cause_specific_mortality_rate'],
         'diarrheal_diseases':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
-             'incidence_rate', 'prevalence', 'remission_rate'],
+             'incidence_rate', 'prevalence', 'remission_rate', 'restrictions'],
         'lower_respiratory_infections':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
-             'incidence_rate', 'prevalence', 'remission_rate'],
+             'incidence_rate', 'prevalence', 'remission_rate', 'restrictions'],
         'measles':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
-             'incidence_rate', 'prevalence'],
+             'incidence_rate', 'prevalence', 'restrictions'],
         'neonatal_sepsis_and_other_neonatal_infections':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
-             'birth_prevalence', 'prevalence'],
+             'birth_prevalence', 'prevalence', 'restrictions'],
         'neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma':
             ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
-             'birth_prevalence', 'prevalence'],
+             'birth_prevalence', 'prevalence', 'restrictions'],
         'neonatal_preterm_birth':
-            ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight'],
+            ['cause_specific_mortality_rate', 'excess_mortality_rate', 'disability_weight',
+             'restrictions'],
     }
 
     for cause, measures in cause_measures.items():
