@@ -3,6 +3,7 @@ from functools import partial
 from pathlib import Path
 from typing import Sequence, Mapping
 
+import pandas as pd
 from loguru import logger
 
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
@@ -17,6 +18,16 @@ def safe_write(artifact: Artifact, keys: Sequence, getters: Mapping):
             artifact.write(key, data)
         else:
             logger.info(f'{key} found in artifact.')
+
+
+def safe_write_by_draw(path, keys, getters):
+    for key in keys:
+        data = getters[key]()
+        with pd.HDFStore(path, complevel=9, mode='w') as store:
+            store.put(f'{key}/index', data.index.to_frame(index=False))
+            data = data.reset_index(drop=True)
+            for c in data.columns:
+                store.put(f'{key}/{c}', data[c])
 
 
 def create_new_artifact(path: str, location: str) -> Artifact:
@@ -117,7 +128,12 @@ def write_lbwsg_data(artifact, location):
     keys.extend(metadata_keys)
     getters.update(metadata_getters)
 
+    # relative risk is written by draw to save space
+    rr_key = EntityKey(f'risk_factor.{risk}.relative_risk')
+    keys.remove(rr_key)
+
     safe_write(artifact, keys, getters)
+    safe_write_by_draw(artifact.path, [rr_key], {rr_key: getters.pop(rr_key)})
 
 
 def build_artifact(location: str, output_dir: str, erase: bool):
