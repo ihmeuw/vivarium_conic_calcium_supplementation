@@ -35,7 +35,8 @@ def safe_write_by_draw(path, keys, getters):
                     draws_written.append(c)
         if draws_written:
             logger.info(f">>> wrote data for draws [{' '.join(draws_written)}] under {key}.")
-
+        else:
+            logger.info(f"all draws found for {key}.")
 
 def create_new_artifact(path: str, location: str) -> Artifact:
     logger.info(f"Creating artifact at {path}.")
