@@ -25,7 +25,7 @@ def safe_write_by_draw(path, keys, getters):
         logger.info(f'looking for {key} draw-level data.')
         data = getters[key]()
         draws_written = []
-        with pd.HDFStore(path, complevel=9, mode='w') as store:
+        with pd.HDFStore(path, complevel=9, mode='a') as store:
             store.put(f'{key.path}/index', data.index.to_frame(index=False))
             data = data.reset_index(drop=True)
             for c in data.columns:
