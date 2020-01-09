@@ -22,12 +22,19 @@ def safe_write(artifact: Artifact, keys: Sequence, getters: Mapping):
 
 def safe_write_by_draw(path, keys, getters):
     for key in keys:
+        logger.info(f'looking for {key} draw-level data.')
         data = getters[key]()
+        draws_written = []
         with pd.HDFStore(path, complevel=9, mode='w') as store:
-            store.put(f'{key}/index', data.index.to_frame(index=False))
+            store.put(f'{key.path}/index', data.index.to_frame(index=False))
             data = data.reset_index(drop=True)
             for c in data.columns:
-                store.put(f'{key}/{c}', data[c])
+                draw_key = f'{key}/{c}'
+                if draw_key not in store:
+                    store.put(f'{key}/{c}', data[c])
+                    draws_written.append(c)
+        if draws_written:
+            logger.info(f">>> wrote data for draws [{' '.join(draws_written)}] under {key}.")
 
 
 def create_new_artifact(path: str, location: str) -> Artifact:
