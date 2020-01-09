@@ -29,9 +29,9 @@ def safe_write_by_draw(path, keys, getters):
             store.put(f'{key.path}/index', data.index.to_frame(index=False))
             data = data.reset_index(drop=True)
             for c in data.columns:
-                draw_key = f'{key}/{c}'
+                draw_key = f'{key.path}/{c}'
                 if draw_key not in store:
-                    store.put(f'{key}/{c}', data[c])
+                    store.put(draw_key, data[c])
                     draws_written.append(c)
         if draws_written:
             logger.info(f">>> wrote data for draws [{' '.join(draws_written)}] under {key}.")
