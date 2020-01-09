@@ -282,7 +282,5 @@ def read_data_by_draw(path, key, draw):
     with pd.HDFStore(path, mode='r') as store:
         index = store.get(f'{key}/index')
         draw = store.get(f'{key}/draw_{draw}')
-    return pd.DataFrame({'value': draw}, index=index)
-
-    #     draw.rename("value", inplace=True)
-    # return pd.concat([index, draw], axis=1)
+    draw.rename("value", inplace=True)
+    return pd.concat([index, draw], axis=1)
