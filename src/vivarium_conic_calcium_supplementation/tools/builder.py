@@ -3,6 +3,7 @@ from functools import partial
 from pathlib import Path
 from typing import Sequence, Mapping
 
+import pandas as pd
 from loguru import logger
 
 from vivarium.framework.artifact import EntityKey, get_location_term, Artifact
@@ -18,6 +19,24 @@ def safe_write(artifact: Artifact, keys: Sequence, getters: Mapping):
         else:
             logger.info(f'{key} found in artifact.')
 
+
+def safe_write_by_draw(path, keys, getters):
+    for key in keys:
+        logger.info(f'looking for {key} draw-level data.')
+        data = getters[key]()
+        draws_written = []
+        with pd.HDFStore(path, complevel=9, mode='a') as store:
+            store.put(f'{key.path}/index', data.index.to_frame(index=False))
+            data = data.reset_index(drop=True)
+            for c in data.columns:
+                draw_key = f'{key.path}/{c}'
+                if draw_key not in store:
+                    store.put(draw_key, data[c])
+                    draws_written.append(c)
+        if draws_written:
+            logger.info(f">>> wrote data for draws [{' '.join(draws_written)}] under {key}.")
+        else:
+            logger.info(f"all draws found for {key}.")
 
 def create_new_artifact(path: str, location: str) -> Artifact:
     logger.info(f"Creating artifact at {path}.")
@@ -117,7 +136,12 @@ def write_lbwsg_data(artifact, location):
     keys.extend(metadata_keys)
     getters.update(metadata_getters)
 
+    # relative risk is written by draw to save space
+    rr_key = EntityKey(f'risk_factor.{risk}.relative_risk')
+    keys.remove(rr_key)
+
     safe_write(artifact, keys, getters)
+    safe_write_by_draw(artifact.path, [rr_key], {rr_key: getters.pop(rr_key)})
 
 
 def build_artifact(location: str, output_dir: str, erase: bool):

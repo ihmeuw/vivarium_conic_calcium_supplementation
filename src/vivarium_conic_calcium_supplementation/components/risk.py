@@ -1,9 +1,15 @@
 from typing import Tuple
+from pathlib import Path
 
 import pandas as pd
 from vivarium_public_health.utilities import EntityString, TargetString
 import vivarium_public_health.risks.data_transformations as data_transformations
+from vivarium_public_health.risks.data_transformations import validate_relative_risk_data_source
+from vivarium_public_health.risks.data_transformations import rebin_relative_risk_data
+from vivarium_public_health.risks.data_transformations import get_distribution_type
+from vivarium_public_health.risks.data_transformations import pivot_categorical
 from vivarium_public_health.risks import RiskEffect
+from vivarium.framework.randomness import RandomnessStream
 
 MISSING_CATEGORY = 'cat212'
 
@@ -41,7 +47,8 @@ class LBWSGRisk:
             preferred_post_processor=self.exposure_distribution.convert_to_categorical
         )
 
-        builder.population.initializes_simulants(self.on_initialize_simulants)
+        builder.population.initializes_simulants(self.on_initialize_simulants,
+                                                 creates_columns=[])
 
     def get_current_exposure(self, index):
         new_index = index.difference(self._cached_exposure.index)
@@ -235,6 +242,47 @@ class LBWSGRiskEffect:
         return self.exposure_effect(target, self.relative_risk(index))
 
     def get_relative_risk_data(self, builder):
-        rr_data = data_transformations.get_relative_risk_data(builder, self.risk, self.target, self.randomness)
+        rr_data = get_relative_risk_data_by_draw(builder, self.risk, self.target, self.randomness)
         rr_data[MISSING_CATEGORY] = (rr_data['cat106'] + rr_data['cat116']) / 2
         return rr_data
+
+
+# Pulled from vivarium_public_health.risks.data_transformations
+def get_relative_risk_data_by_draw(builder, risk: EntityString, target: TargetString, randomness: RandomnessStream):
+    source_type = validate_relative_risk_data_source(builder, risk, target)
+    relative_risk_data = load_relative_risk_data_by_draw(builder, risk, target, source_type)
+    relative_risk_data = rebin_relative_risk_data(builder, risk, relative_risk_data)
+
+    if get_distribution_type(builder, risk) in ['dichotomous', 'ordered_polytomous', 'unordered_polytomous']:
+        relative_risk_data = pivot_categorical(relative_risk_data)
+    else:
+        relative_risk_data = relative_risk_data.drop(['parameter'], 'columns')
+
+    return relative_risk_data
+
+
+def load_relative_risk_data_by_draw(builder, risk: EntityString, target: TargetString, source_type: str):
+
+    artifact_path = Path(builder.data._manager.artifact.path).resolve()
+
+    relative_risk_data = None
+    if source_type == 'data':
+        relative_risk_data = read_data_by_draw(str(artifact_path), f'{risk}.relative_risk',
+                                               builder.configuration.input_data.input_draw_number)
+        correct_target = ((relative_risk_data['affected_entity'] == target.name)
+                          & (relative_risk_data['affected_measure'] == target.measure))
+        relative_risk_data = (relative_risk_data[correct_target]
+                              .drop(['affected_entity', 'affected_measure'], 'columns'))
+
+    return relative_risk_data
+
+
+def read_data_by_draw(path, key, draw):
+    key = key.replace(".", "/")
+    with pd.HDFStore(path, mode='r') as store:
+        index = store.get(f'{key}/index')
+        draw = store.get(f'{key}/draw_{draw}')
+    return pd.DataFrame({'value': draw}, index=index)
+
+    #     draw.rename("value", inplace=True)
+    # return pd.concat([index, draw], axis=1)
