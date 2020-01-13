@@ -59,13 +59,17 @@ class CalciumSupplementationIntervention:
                                                  creates_columns=columns_created)
 
         builder.value.register_value_modifier('low_birth_weight_and_short_gestation.raw_exposure',
-                                              self.adjust_lbwsg)
+                                              self.adjust_lbwsg,
+                                              requires_columns=['calcium_supplementation_treatment_status'])
         builder.value.register_value_modifier('child_stunting.exposure',
-                                              self.adjust_stunting)
+                                              self.adjust_stunting,
+                                              requires_columns=['calcium_supplementation_treatment_status'])
         builder.value.register_value_modifier('child_wasting.exposure',
-                                              self.adjust_wasting)
+                                              self.adjust_wasting,
+                                              requires_columns=['calcium_supplementation_treatment_status'])
         builder.value.register_value_modifier('child_underweight.exposure',
-                                              self.adjust_underweight)
+                                              self.adjust_underweight,
+                                              requires_columns=['calcium_supplementation_treatment_status'])
 
         self.pop_birth_weight_mean = self.get_population_effect_size(self.config.birth_weight_shift.population.mean,
                                                                      self.config.birth_weight_shift.population.sd,
@@ -137,9 +141,9 @@ class CalciumSupplementationIntervention:
         return pd.Series(effect_size, index=index)
 
     def adjust_lbwsg(self, index, exposure):
-        pop = self.population_view.get(index)
-        exposure['birth_weight'] += self.ind_birth_weight_effect.loc[pop.index] * (pop.calcium_supplementation_treatment_status == 'treated')
-        exposure['gestation_time'] += self.ind_gestation_time_effect[pop.index] * (pop.calcium_supplementation_treatment_status == 'treated')
+        pop = self.population_view.subview(['calcium_supplementation_treatment_status']).get(index)
+        exposure['birth_weight'] += self.ind_birth_weight_effect.loc[pop.index] * (pop['calcium_supplementation_treatment_status'] == 'treated')
+        exposure['gestation_time'] += self.ind_gestation_time_effect[pop.index] * (pop['calcium_supplementation_treatment_status'] == 'treated')
         return exposure
 
     def adjust_stunting(self, index, exposure):
