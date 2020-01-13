@@ -25,41 +25,39 @@ class LBWSGRisk:
 
     @property
     def name(self):
-        return "low_birthweight_short_gestation_risk"
+        return "low_birth_weight_short_gestation_risk"
 
     def __init__(self):
         self.risk = EntityString('risk_factor.low_birth_weight_and_short_gestation')
 
     def setup(self, builder):
         self.exposure_distribution = LBWSGDistribution(builder)
-        self._raw_bw_and_gt = pd.DataFrame(columns=['birth_weight', 'gestation_time'])
+
+        self.birthweight_gestation_time_view = builder.population.get_view(['birth_weight', 'gestation_time'])
 
         self._raw_exposure = builder.value.register_value_producer(
             f'{self.risk.name}.raw_exposure',
-            source=lambda index: self._raw_bw_and_gt.loc[index]
+            source=lambda index: self.birthweight_gestation_time_view.get(index),
+            # source=lambda index: self._raw_bw_and_gt.loc[index],
+            requires_columns=['birth_weight', 'gestation_time']
         )
-
-        self._cached_exposure = pd.DataFrame(columns=['birth_weight', 'gestation_time'])
 
         self.exposure = builder.value.register_value_producer(
             f'{self.risk.name}.exposure',
-            source=self.get_current_exposure,
-            preferred_post_processor=self.exposure_distribution.convert_to_categorical
+            source=self._raw_exposure,
+            preferred_post_processor=self.exposure_distribution.convert_to_categorical,
+            requires_values=f'{self.risk.name}.raw_exposure'
         )
 
         builder.population.initializes_simulants(self.on_initialize_simulants,
-                                                 creates_columns=[])
-
-    def get_current_exposure(self, index):
-        new_index = index.difference(self._cached_exposure.index)
-        if not new_index.empty:
-            self._cached_exposure = self._cached_exposure.append(self._raw_exposure(new_index))
-        return self._cached_exposure.loc[index]
+                                                 creates_columns=['birth_weight', 'gestation_time'])
 
     def on_initialize_simulants(self, pop_data):
-        self._raw_bw_and_gt = self._raw_bw_and_gt.append(
-            self.exposure_distribution.get_birth_weight_and_gestational_age(pop_data.index)
-        )
+        exposure = self.exposure_distribution.get_birth_weight_and_gestational_age(pop_data.index)
+        self.birthweight_gestation_time_view.update(pd.DataFrame({
+            'birth_weight': exposure['birth_weight'],
+            'gestation_time': exposure['gestation_time']
+        }, index=pop_data.index))
 
 
 class LBWSGDistribution:
