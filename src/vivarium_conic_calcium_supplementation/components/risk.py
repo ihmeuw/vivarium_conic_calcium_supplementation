@@ -38,7 +38,6 @@ class LBWSGRisk:
         self._raw_exposure = builder.value.register_value_producer(
             f'{self.risk.name}.raw_exposure',
             source=lambda index: self.birthweight_gestation_time_view.get(index),
-            # source=lambda index: self._raw_bw_and_gt.loc[index],
             requires_columns=['birth_weight', 'gestation_time']
         )
 
