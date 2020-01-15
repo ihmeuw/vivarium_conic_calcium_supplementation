@@ -3,7 +3,6 @@ components:
         population:
             - BasePopulation()
             - Mortality()
-            # - FertilityCrudeBirthRate()
         disease.models:
             - SIS('diarrheal_diseases')
             - SIS('lower_respiratory_infections')
@@ -11,17 +10,18 @@ components:
             - NeonatalSWC_without_incidence('neonatal_sepsis_and_other_neonatal_infections')
             - NeonatalSWC_without_incidence('neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma')
             - NeonatalSWC_without_incidence('hemolytic_disease_and_other_neonatal_jaundice')
-
-    vivarium_conic_calcium_supplementation:
-        components:
-            - CalciumSupplementationIntervention()
+        risks.implementations.low_birth_weight_and_short_gestation:
             - LBWSGRisk()
-            - NeonatalPreterm()
             - LBWSGRiskEffect('cause.neonatal_sepsis_and_other_neonatal_infections.excess_mortality_rate')
             - LBWSGRiskEffect('cause.neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma.excess_mortality_rate')
             - LBWSGRiskEffect('cause.hemolytic_disease_and_other_neonatal_jaundice.excess_mortality_rate')
             - LBWSGRiskEffect('cause.diarrheal_diseases.excess_mortality_rate')
             - LBWSGRiskEffect('cause.lower_respiratory_infections.excess_mortality_rate')
+
+    vivarium_conic_calcium_supplementation:
+        components:
+            - CalciumSupplementationIntervention()
+            - NeonatalPreterm()
 
     vivarium_public_health.metrics:
         - DisabilityObserver()
@@ -53,7 +53,7 @@ configuration:
     population:
         population_size: 10_000
         age_start: 0
-        age_end: 0
+        age_end: 0.001
         exit_age: 5
 
     calcium_supplementation_intervention:
