@@ -18,15 +18,16 @@ if __name__ == "__main__":
 
     install_requirements = [
         'vivarium==0.9.3',
-        'vivarium_public_health==0.10.3',
+        'vivarium_public_health==0.10.4',
         'vivarium_cluster_tools==1.1.2',
-        'vivarium_inputs[data]==3.1.0',
+        'vivarium_inputs[data]==3.1.1',
         
         # These are pinned for internal dependencies on IHME libraries
         'numpy<=1.15.4',
         'tables<=3.4.0',
         'pandas<0.25',        
         
+        'click',
         'scipy',
         'matplotlib',
         'seaborn',
@@ -56,4 +57,10 @@ if __name__ == "__main__":
         install_requires=install_requirements,
 
         zip_safe=False,
+
+        entry_points='''
+            [console_scripts]
+            make_specs=vivarium_conic_calcium_supplementation.tools.cli:make_specs
+            build_calcium_artifact=vivarium_conic_calcium_supplementation.tools.cli:build_calcium_artifact
+        '''
     )
