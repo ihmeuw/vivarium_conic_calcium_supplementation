@@ -1,15 +1,8 @@
-plugins:
-    optional:
-        data:
-            controller: "vivarium_public_health.dataset_manager.ArtifactManager"
-            builder_interface: "vivarium_public_health.dataset_manager.ArtifactManagerInterface"
-
 components:
     vivarium_public_health:
         population:
             - BasePopulation()
             - Mortality()
-            - FertilityCrudeBirthRate()
         disease.models:
             - SIS('diarrheal_diseases')
             - SIS('lower_respiratory_infections')
@@ -23,22 +16,22 @@ components:
             - CalciumSupplementationIntervention()
             - LBWSGRisk()
             - NeonatalPreterm()
-            - LBWSGRiskEffect('cause.neonatal_sepsis_and_other_neonatal_infections.excess_mortality')
-            - LBWSGRiskEffect('cause.neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma.excess_mortality')
-            - LBWSGRiskEffect('cause.hemolytic_disease_and_other_neonatal_jaundice.excess_mortality')
-            - LBWSGRiskEffect('cause.diarrheal_diseases.excess_mortality')
-            - LBWSGRiskEffect('cause.lower_respiratory_infections.excess_mortality')
+            - LBWSGRiskEffect('cause.neonatal_sepsis_and_other_neonatal_infections.excess_mortality_rate')
+            - LBWSGRiskEffect('cause.neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma.excess_mortality_rate')
+            - LBWSGRiskEffect('cause.hemolytic_disease_and_other_neonatal_jaundice.excess_mortality_rate')
+            - LBWSGRiskEffect('cause.diarrheal_diseases.excess_mortality_rate')
+            - LBWSGRiskEffect('cause.lower_respiratory_infections.excess_mortality_rate')
 
     vivarium_public_health.metrics:
-        - Disability()
+        - DisabilityObserver()
         - MortalityObserver()
         - CategoricalRiskObserver('risk_factor.low_birth_weight_and_short_gestation')
 
 configuration:
     input_data:
-        location: Mali
+        location: {{ location_proper }}
         input_draw_number: 0
-        artifact_path: /share/costeffectiveness/artifacts/vivarium_conic_calcium_supplementation/vivarium_conic_calcium_supplementation_mali.hdf
+        artifact_path: /share/costeffectiveness/artifacts/vivarium_conic_calcium_supplementation/{{ location_sanitized }}.hdf
     interpolation:
         order: 0
         extrapolate: True
@@ -59,7 +52,7 @@ configuration:
     population:
         population_size: 10_000
         age_start: 0
-        age_end: 5
+        age_end: 0.001
         exit_age: 5
 
     calcium_supplementation_intervention:
@@ -73,7 +66,7 @@ configuration:
                 sd: 0.0
         gestation_time_shift:  # weeks
             population:
-                # from a regression analysis by Oumar Diallo
+                # From a regression analysis by Oumar Diallo
                 mean: 0.4349
                 sd: 0.160842
             individual:
@@ -90,4 +83,5 @@ configuration:
             by_year: False
         sample_history_observer:
             sample_size: 500
-            path: /share/costeffectiveness/results/vivarium_conic_calcium_supplementation/mali_sample_history.hdf
+            path: /share/costeffectiveness/results/vivarium_conic_calcium_supplementation/{{ location_sanitized }}_sample_history.hdf
+

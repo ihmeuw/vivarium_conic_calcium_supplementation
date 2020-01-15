@@ -27,6 +27,7 @@ if __name__ == "__main__":
         'tables<=3.4.0',
         'pandas<0.25',        
         
+        'click',
         'scipy',
         'matplotlib',
         'seaborn',
@@ -56,4 +57,9 @@ if __name__ == "__main__":
         install_requires=install_requirements,
 
         zip_safe=False,
+
+        entry_points='''
+            [console_scripts]
+            make_specs=vivarium_conic_calcium_supplementation.tools.cli:make_specs
+        '''
     )
