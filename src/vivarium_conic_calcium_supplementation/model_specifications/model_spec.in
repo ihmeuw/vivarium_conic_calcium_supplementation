@@ -3,7 +3,6 @@ components:
         population:
             - BasePopulation()
             - Mortality()
-            # - FertilityCrudeBirthRate()
         disease.models:
             - SIS('diarrheal_diseases')
             - SIS('lower_respiratory_infections')
