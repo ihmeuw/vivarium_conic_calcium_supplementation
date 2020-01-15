@@ -24,6 +24,11 @@ import click
 from jinja2 import Template
 from loguru import logger
 
+from vivarium.framework.utilities import handle_exceptions
+
+from vivarium_conic_calcium_supplementation import paths
+from vivarium_conic_calcium_supplementation.tools import builder
+
 
 MODEL_SPEC_DIR = (Path(__file__).parent.parent / 'model_specifications').resolve()
 Location = namedtuple('Location', ['proper', 'sanitized'])
@@ -162,3 +167,23 @@ def make_specs(template: str, locations_file: str, single_location: str, output_
             outfile.write(jinja_temp.render(
                 location_proper=location.proper,
                 location_sanitized=location.sanitized))
+
+
+@click.command()
+@click.option('-l', '--location',
+              required=True,
+              help='The location for which to build an artifact')
+@click.option('-o', '--output-dir',
+              default=str(paths.ARTIFACT_ROOT),
+              show_default=True,
+              type=click.Path(exists=True, dir_okay=True),
+              help='Specify an output directory. Directory must exist.')
+@click.option('-e', '--erase',
+              default=False,
+              type=click.BOOL,
+              help='Erase artifact if it exists.')
+def build_calcium_artifact(location: str, output_dir: str, erase: bool) -> None:
+    """Build an artifact for the provided location
+    """
+    main = handle_exceptions(builder.build_artifact, logger, with_debugger=True)
+    main(location, output_dir, erase)
